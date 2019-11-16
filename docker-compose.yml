@@ -1,0 +1,50 @@
+version: '2.1'
+
+networks: 
+  default:
+    name: buscalibre
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+
+services:
+  DB:
+    image: "postgres"
+    container_name: "postgres"
+    environment:
+      - POSTGRES_USER=raicerk
+      - POSTGRES_PASSWORD=qwerty123
+      - POSTGRES_DB=buscalibre
+    ports:
+      - 5432:5432
+    networks:
+      default:
+        ipv4_address: 172.21.0.2
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  API:
+    image: api
+    container_name: "api"
+    build: './API'
+    ports:
+      - 80:5000
+    networks:
+      default:
+        ipv4_address: 172.21.0.3
+  BOT:
+    image: bot
+    container_name: "bot"
+    build: './BotTelegram'
+    networks:
+      default:
+        ipv4_address: 172.21.0.4
+  SCRAPING:
+    image: scraping
+    container_name: scraping
+    build: './Scraping'
+    networks: 
+      default:
+        ipv4_address: 172.21.0.5
+    volumes: 
+      - /etc/localtime:/etc/localtime:ro 
