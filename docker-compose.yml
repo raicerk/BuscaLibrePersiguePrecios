@@ -12,10 +12,8 @@ services:
   DB:
     image: "postgres"
     container_name: "postgres"
-    environment:
-      - POSTGRES_USER=raicerk
-      - POSTGRES_PASSWORD=qwerty123
-      - POSTGRES_DB=buscalibre
+    env_file: 
+      - 'config.env'
     ports:
       - 5432:5432
     networks:
@@ -32,6 +30,8 @@ services:
     networks:
       default:
         ipv4_address: 172.21.0.3
+    env_file: 
+      - 'config.env'
   BOT:
     image: bot
     container_name: "bot"
@@ -47,4 +47,6 @@ services:
       default:
         ipv4_address: 172.21.0.5
     volumes: 
-      - /etc/localtime:/etc/localtime:ro 
+      - /etc/localtime:/etc/localtime:ro
+    env_file: 
+      - 'config.env'
