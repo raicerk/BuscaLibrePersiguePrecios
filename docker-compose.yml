@@ -1,6 +1,6 @@
-version: '2.1'
+version: "2.1"
 
-networks: 
+networks:
   default:
     name: buscalibre
     driver: bridge
@@ -12,8 +12,8 @@ services:
   DB:
     image: "postgres"
     container_name: "postgres"
-    env_file: 
-      - 'config.env'
+    env_file:
+      - "config.env"
     ports:
       - 5432:5432
     networks:
@@ -24,31 +24,39 @@ services:
   API:
     image: api
     container_name: "api"
-    build: './API'
+    build: "./API"
     ports:
       - 80:5000
     networks:
       default:
         ipv4_address: 172.21.0.3
-    env_file: 
-      - 'config.env'
+    env_file:
+      - "config.env"
+    depends_on:
+      - DB
   BOT:
     image: bot
     container_name: "bot"
-    build: './BotTelegram'
+    build: "./BotTelegram"
     networks:
       default:
         ipv4_address: 172.21.0.4
-    env_file: 
-      - 'config.env'
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - "config.env"
+    depends_on:
+      - API
   SCRAPING:
     image: scraping
     container_name: scraping
-    build: './Scraping'
-    networks: 
+    build: "./Scraping"
+    networks:
       default:
         ipv4_address: 172.21.0.5
-    volumes: 
+    volumes:
       - /etc/localtime:/etc/localtime:ro
-    env_file: 
-      - 'config.env'
+    env_file:
+      - "config.env"
+    depends_on:
+      - DB
