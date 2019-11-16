@@ -39,6 +39,8 @@ services:
     networks:
       default:
         ipv4_address: 172.21.0.4
+    env_file: 
+      - 'config.env'
   SCRAPING:
     image: scraping
     container_name: scraping
