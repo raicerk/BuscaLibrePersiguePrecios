@@ -5,6 +5,7 @@ import os
 
 bot = telebot.TeleBot(os.getenv('TOKEN_TELEGRAM'))
 
+
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
 
