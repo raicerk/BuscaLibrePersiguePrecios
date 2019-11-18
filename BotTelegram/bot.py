@@ -19,14 +19,14 @@ def is_url(url):
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
 
-    bot.send_message(
-        message.chat.id, "Bienvenido a BuscaLibre persigue precios Bot")
     r = requests.post("http://{}/creausuario".format(os.getenv('API_HOST')), json={
         "idusuario": message.chat.id,
         "idchat": message.from_user.id
     })
 
     print(r.json())
+
+    bot.send_message(message.chat.id, "Bienvenido a BuscaLibre persigue precios Bot")
 
     while True:
         if time.strftime("%H:%M:%S") == os.getenv('HORA_ALERTA'):
@@ -61,9 +61,9 @@ def send_stop(message):
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
 
-	if is_url(message.text):
-		
-		user_id = message.from_user.id
+    if is_url(message.text):
+        
+        user_id = message.from_user.id
         message_id = message.chat.id
         message_text = message.text
         if len(message_text.split('/seguir ')) > 0:
@@ -87,16 +87,16 @@ def callback_query(call):
     })
 
     print(r.json())
-	
+
     opciones = []
     
     for iter in call.message.json["reply_markup"]["inline_keyboard"]:
         opciones.append(iter[0])
-	
-	filtrado = list(filter(lambda iter: iter["callback_data"] == call.data, opciones))
 
-	bot.send_message(call.from_user.id, "Se elimino del analisis el libro {}".format(filtrado[0]["text"]))		
-	
+    filtrado = list(filter(lambda iter: iter["callback_data"] == call.data, opciones))
+
+    bot.send_message(call.from_user.id, "Se elimino del analisis el libro {}".format(filtrado[0]["text"]))
+
 @bot.message_handler(commands=['help', 'ayuda'])
 def send_help(message):
     message_id = message.chat.id
