@@ -73,5 +73,25 @@ def get_preciosnuevos():
             'ok': 400
         })
 
+
+@app.route('/librospreciosnuevos', methods=['POST'])
+def get_preciosnuevos():
+
+    try:
+        data = request.json
+    
+        dtb = db.database()
+        dtb.idchat = data['idchat']
+        lista = dtb.getListaLibrosActivos()
+        return jsonify({
+            'ok': 200,
+            "lista": lista
+        })
+    except Exception as error:
+        print(error)
+        return jsonify({
+            'ok': 400
+        })
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
