@@ -148,7 +148,8 @@ class database:
                 arraylibros.append({
                     "id":row[0],
                     "nombre": row[1],
-                    "autor":row[2]
+                    "autor":row[2],
+                    "idusuario": row[3]
                 })
             return arraylibros
         except (Exception, psycopg2.Error) as error:
@@ -157,7 +158,7 @@ class database:
     def set_estadolinkusuario(self):
         
         try:
-            update_query = "UPDATE public.usuario_link SET estado = false WHERE idusuario={};".format(self.idusuario)
+            update_query = "UPDATE public.usuario_link SET estado = false WHERE idusuario={} AND idlink={};".format(self.idusuario, self.idlink)
             cursor = self.connection.cursor()
             cursor.execute(update_query)
             self.connection.commit()

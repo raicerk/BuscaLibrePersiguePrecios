@@ -92,7 +92,7 @@ def get_librosusuario():
             'ok': 400
         })
 
-@app.route('/librosactivossusuario', methods=['POST'])
+@app.route('/estadolibrousuario', methods=['POST'])
 def set_estadolibrousuario():
 
     try:
@@ -100,6 +100,7 @@ def set_estadolibrousuario():
     
         dtb = db.database()
         dtb.idusuario = data['idusuario']
+        dtb.idlink = data['idlink']
         updated = dtb.set_estadolinkusuario()
         return jsonify({
             'ok': 200
