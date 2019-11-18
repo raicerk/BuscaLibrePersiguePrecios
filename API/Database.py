@@ -123,3 +123,33 @@ class database:
             return arraylibros
         except (Exception, psycopg2.Error) as error:
             print(error)
+
+
+    def getListaLibrosActivos(self):
+        try:
+            select_query = '''select link.id,
+                    link.nombre,
+                    link.autor
+            from usuariotelegram as usutel
+            inner join usuario_link usulink
+            on usutel.idusuario = usulink.idusuario
+            inner join link as link
+            on usulink.idlink = link.id
+            where usutel.idchat = {} and
+            usulink.estado = true
+            '''.format(self.idchat)
+
+            cursor = self.connection.cursor()
+            cursor.execute(select_query)
+            datos = cursor.fetchall()                
+            self.connection.commit()
+            arraylibros = []
+            for row in datos:
+                arraylibros.append({
+                    "id":row[0],
+                    "nombre": row[1],
+                    "autor":row[2]
+                })
+            return arraylibros
+        except (Exception, psycopg2.Error) as error:
+            print(error)
