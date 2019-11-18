@@ -74,8 +74,8 @@ def get_preciosnuevos():
         })
 
 
-@app.route('/librospreciosnuevos', methods=['POST'])
-def get_preciosnuevos():
+@app.route('/librosactivossusuario', methods=['POST'])
+def get_librosusuario():
 
     try:
         data = request.json
