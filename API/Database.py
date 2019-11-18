@@ -124,12 +124,12 @@ class database:
         except (Exception, psycopg2.Error) as error:
             print(error)
 
-
     def getListaLibrosActivos(self):
         try:
             select_query = '''select link.id,
                     link.nombre,
-                    link.autor
+                    link.autor,
+                    usutel.idchat
             from usuariotelegram as usutel
             inner join usuario_link usulink
             on usutel.idusuario = usulink.idusuario
@@ -151,5 +151,19 @@ class database:
                     "autor":row[2]
                 })
             return arraylibros
+        except (Exception, psycopg2.Error) as error:
+            print(error)
+
+    def set_estadolinkusuario(self):
+        
+        try:
+            update_query = "UPDATE public.usuario_link SET estado = false WHERE idusuario={};".format(self.idusuario)
+            cursor = self.connection.cursor()
+            cursor.execute(update_query)
+            self.connection.commit()
+            count = cursor.rowcount
+            print (count, "Record updated successfully into table")
+            return count
+
         except (Exception, psycopg2.Error) as error:
             print(error)

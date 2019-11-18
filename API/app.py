@@ -73,7 +73,6 @@ def get_preciosnuevos():
             'ok': 400
         })
 
-
 @app.route('/librosactivossusuario', methods=['POST'])
 def get_librosusuario():
 
@@ -86,6 +85,24 @@ def get_librosusuario():
         return jsonify({
             'ok': 200,
             "lista": lista
+        })
+    except Exception as error:
+        print(error)
+        return jsonify({
+            'ok': 400
+        })
+
+@app.route('/librosactivossusuario', methods=['POST'])
+def set_estadolibrousuario():
+
+    try:
+        data = request.json
+    
+        dtb = db.database()
+        dtb.idusuario = data['idusuario']
+        updated = dtb.set_estadolinkusuario()
+        return jsonify({
+            'ok': 200
         })
     except Exception as error:
         print(error)
