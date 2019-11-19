@@ -1,6 +1,9 @@
 from flask import Flask, jsonify, request
 import json
 import Database as db
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 

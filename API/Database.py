@@ -1,5 +1,9 @@
 import psycopg2
 import os
+import Scraping as scraping
+import logging
+
+
 
 class database:
 
@@ -9,7 +13,8 @@ class database:
     idlink = 0
     idchat = 0
 
-    def __init__(self): 
+    def __init__(self):
+        logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO,datefmt="%H:%M:%S")
         self.connection = psycopg2.connect(
                 user = os.getenv('POSTGRES_USER'),
                 password = os.getenv('POSTGRES_PASSWORD'),
@@ -21,34 +26,38 @@ class database:
     def setLink(self):
 
         try:
-            insert_query = "INSERT INTO link (link, estado) values ('{}',{}) RETURNING id;".format(self.link, True)
+            scr = scraping.scraping()
+            scr.url = self.link
+            result = scr.scrap()
+            logging.info(result)
+            insert_query = "INSERT INTO link (link, nombre, autor, estado) values ('{}','{}','{}',{}) RETURNING id;".format(self.link, scr.name, scr.author, True)
             cursor = self.connection.cursor()
             cursor.execute(insert_query)
             id_inserted = cursor.fetchone()[0]
             self.connection.commit()
             count = cursor.rowcount
-            print (count, "Record inserted successfully into table")
-            print (id_inserted, "ID inserted successfully into table")
+            logging.info(count, "Record inserted successfully into table")
+            logging.info(id_inserted, "ID inserted successfully into table")
             return id_inserted
 
         except (Exception, psycopg2.Error) as error:
-            print(error)
+            logging.error(error)
 
     def setUsuarioLink(self):
 
         try:
-            insert_query = "INSERT INTO usuario_link (idusuario, idlink) values ('{}',{}) RETURNING id".format(self.idusuario, self.idlink, True)
+            insert_query = "INSERT INTO usuario_link (idusuario, idlink, estado) values ('{}',{}, {}) RETURNING id".format(self.idusuario, self.idlink, True)
             cursor = self.connection.cursor()
             cursor.execute(insert_query)
             id_inserted = cursor.fetchone()[0]
             self.connection.commit()
             count = cursor.rowcount
-            print (count, "Record inserted successfully into table")
-            print (id_inserted, "ID inserted successfully into table")
+            logging.info(count, "Record inserted successfully into table")
+            logging.info(id_inserted, "ID inserted successfully into table")
             return id_inserted
 
         except (Exception, psycopg2.Error) as error:
-            print(error)
+            logging.info(error)
 
     def setUsuario(self):
 
@@ -59,12 +68,12 @@ class database:
             id_inserted = cursor.fetchone()[0]
             self.connection.commit()
             count = cursor.rowcount
-            print (count, "Record inserted successfully into table")
-            print (id_inserted, "ID inserted successfully into table")
+            logging.info(count, "Record inserted successfully into table")
+            logging.info(id_inserted, "ID inserted successfully into table")
             return id_inserted
 
         except (Exception, psycopg2.Error) as error:
-            print(error)
+            logging.info(error)
 
     def getListaPreciosUsuarioChat(self):
         
@@ -122,7 +131,7 @@ class database:
                 })
             return arraylibros
         except (Exception, psycopg2.Error) as error:
-            print(error)
+            logging.info(error)
 
     def getListaLibrosActivos(self):
         try:
@@ -153,7 +162,8 @@ class database:
                 })
             return arraylibros
         except (Exception, psycopg2.Error) as error:
-            print(error)
+            logging.info(error)
+            return error
 
     def set_estadolinkusuario(self):
         
@@ -163,8 +173,8 @@ class database:
             cursor.execute(update_query)
             self.connection.commit()
             count = cursor.rowcount
-            print (count, "Record updated successfully into table")
+            logging.info(count, "Record updated successfully into table")
             return count
 
         except (Exception, psycopg2.Error) as error:
-            print(error)
+            logging.info(error)

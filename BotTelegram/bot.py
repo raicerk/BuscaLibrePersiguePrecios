@@ -66,17 +66,17 @@ def echo_all(message):
         user_id = message.from_user.id
         message_id = message.chat.id
         message_text = message.text
-        if len(message_text.split('/seguir ')) > 0:
-            link = message_text.split('/seguir ')[1]
-            r = requests.post("http://{}/almacenaLink".format(os.getenv('API_HOST')), json={
-                "link": link,
-                "idusuario": user_id,
-                "idchat": message_id
-            })
+       
+        r = requests.post("http://{}/almacenaLink".format(os.getenv('API_HOST')), json={
+            "link": message_text,
+            "idusuario": user_id,
+            "idchat": message_id
+        })
+        
+        print(r.json())
 
-            print(r.json())
-
-        bot.send_message(message_id, link + "Libro registrado correctamente, te avisaremos apenas cambie el precio del libro 🙂")
+        if r:
+            bot.send_message(message_id, message_text + "Libro registrado correctamente, te avisaremos apenas cambie el precio del libro 🙂")
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
