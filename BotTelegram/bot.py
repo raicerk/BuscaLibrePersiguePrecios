@@ -76,7 +76,7 @@ def echo_all(message):
         print(r.json())
 
         if r:
-            bot.send_message(message_id, message_text + "Libro registrado correctamente, te avisaremos apenas cambie el precio del libro 🙂")
+            bot.send_message(message_id,"Link registrado correctamente, te avisaremos apenas cambie el precio del libro 🙂")
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
