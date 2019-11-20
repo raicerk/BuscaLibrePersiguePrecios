@@ -82,7 +82,7 @@ def echo_all(message):
 def callback_query(call):
 
     r = requests.post("http://{}/estadolibrousuario".format(os.getenv('API_HOST')), json={
-        "idusuario": call.user_from.id,
+        "idusuario": call.from_user.id,
         "idlink": call.data
     })
 
