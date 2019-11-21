@@ -69,11 +69,12 @@ class database:
                 cursor2.execute(select_query_precio_anterior)
                 datas = cursor2.fetchone()               
                 self.connection.commit()
-
-                if(scr.price != datas[0]):
-                    self.precio = scr.price
-                    self.idlink = row[0]
-                    self.fecha = time.strftime("%Y-%m-%d")
+                self.precio = scr.price
+                self.idlink = row[0]
+                self.fecha = time.strftime("%Y-%m-%d")
+                if(datas is None):
+                    arrayprecios.append(self.setPrecio())
+                elif((scr.price != datas[0])):
                     arrayprecios.append(self.setPrecio())
 
             return arrayprecios
