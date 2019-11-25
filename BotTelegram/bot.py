@@ -6,8 +6,25 @@ import json
 from urllib.parse import urlparse
 from telebot import types
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+import threading
+import logging
 
 bot = telebot.TeleBot(os.getenv('TOKEN_TELEGRAM'))
+
+
+def thread_function(message):
+
+    while True:
+        if time.strftime("%H:%M:%S") == os.getenv('HORA_ALERTA'):
+            res = requests.post("http://{}/librospreciosnuevos".format(os.getenv('API_HOST')), json={
+                "idchat": message.from_user.id
+            })
+            miresponse = res.json()
+            for lst in miresponse['lista']:
+                print(lst)
+                bot.send_message(message.chat.id, "El libro '{}' del autor '{}', a cambiado de precio, de ${} a un nuevo valor de ${}, el link del libro es: {}".format(
+                    lst['nombre'], lst['autor'], lst['precioanterior'], lst['precionuevo'], lst['link']))
+        time.sleep(1)
 
 def is_url(url):
   try:
@@ -28,18 +45,8 @@ def send_welcome(message):
 
     bot.send_message(message.chat.id, "Bienvenido a BuscaLibre persigue precios Bot")
 
-    while True:
-        if time.strftime("%H:%M:%S") == os.getenv('HORA_ALERTA'):
-            res = requests.post("http://{}/librospreciosnuevos".format(os.getenv('API_HOST')), json={
-                "idchat": message.from_user.id
-            })
-            miresponse = res.json()
-            for lst in miresponse['lista']:
-                print(lst)
-                bot.send_message(message.chat.id, "El libro '{}' del autor '{}', a cambiado de precio, de ${} a un nuevo valor de ${}, el link del libro es: {}".format(
-                    lst['nombre'], lst['autor'], lst['precioanterior'], lst['precionuevo'], lst['link']))
-        time.sleep(1)
-
+    threading.Thread(target=thread_function, args=(message,)).start()
+    
 @bot.message_handler(commands=['seguir'])
 def send_forward(message):
     bot.send_message(message.chat.id,"A partir de ahora, cualquier link de un libro de buscalibre que nos envies sera analizado y te avisaremos a penas el precio del libro cambie 🙂")
