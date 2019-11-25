@@ -2,7 +2,7 @@ version: "3.5"
 
 networks:
   buscalibre:
-    name: buscalibre
+    #name: buscalibre
     driver: bridge
     ipam:
       config:
