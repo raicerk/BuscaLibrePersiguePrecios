@@ -11,19 +11,15 @@ import logging
 
 bot = telebot.TeleBot(os.getenv('TOKEN_TELEGRAM'))
 
-
-def thread_function(message):
+def hilo():
 
     while True:
         if time.strftime("%H:%M:%S") == os.getenv('HORA_ALERTA'):
-            res = requests.post("http://{}/librospreciosnuevos".format(os.getenv('API_HOST')), json={
-                "idchat": message.from_user.id
-            })
+            res = requests.post("http://{}/librospreciosnuevos".format(os.getenv('API_HOST')))
             miresponse = res.json()
-            for lst in miresponse['lista']:
-                print(lst)
-                bot.send_message(message.chat.id, "El libro '{}' del autor '{}', a cambiado de precio, de ${} a un nuevo valor de ${}, el link del libro es: {}".format(
-                    lst['nombre'], lst['autor'], lst['precioanterior'], lst['precionuevo'], lst['link']))
+            for lst in miresponse['datos']:
+                for libro in lst['libros']:
+                    bot.send_message(lst['idchat'], "El libro '{}' del autor '{}', a cambiado de precio, de ${} a un nuevo valor de ${}, el link del libro es: {}".format(libro['nombre'], libro['autor'], libro['precioanterior'], libro['precionuevo'], libro['link']))
         time.sleep(1)
 
 def is_url(url):
@@ -41,12 +37,8 @@ def send_welcome(message):
         "idchat": message.from_user.id
     })
 
-    print(r.json())
-
     bot.send_message(message.chat.id, "Bienvenido a BuscaLibre persigue precios Bot")
-
-    threading.Thread(target=thread_function, args=(message,)).start()
-    
+  
 @bot.message_handler(commands=['seguir'])
 def send_forward(message):
     bot.send_message(message.chat.id,"A partir de ahora, cualquier link de un libro de buscalibre que nos envies sera analizado y te avisaremos a penas el precio del libro cambie 🙂")
@@ -79,8 +71,6 @@ def echo_all(message):
             "idusuario": user_id,
             "idchat": message_id
         })
-        
-        print(r.json())
 
         if r:
             bot.send_message(message_id,"Link registrado correctamente, te avisaremos apenas cambie el precio del libro 🙂")
@@ -92,8 +82,6 @@ def callback_query(call):
         "idusuario": call.from_user.id,
         "idlink": call.data
     })
-
-    print(r.json())
 
     opciones = []
     
@@ -109,4 +97,10 @@ def send_help(message):
     message_id = message.chat.id
     bot.send_message(message_id, "Ayuda con los comandos del bot")
 
-bot.polling()
+if __name__ == "__main__":
+
+    logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO,datefmt="%H:%M:%S")
+
+    threading.Thread(target=hilo).start()
+
+    bot.polling()

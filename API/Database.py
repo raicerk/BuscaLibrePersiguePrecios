@@ -178,3 +178,86 @@ class database:
 
         except (Exception, psycopg2.Error) as error:
             logging.info(error)
+
+    def getUsuariosConLinkYLibros(self):
+
+        try:
+
+            sq = '''select ul.idusuario 
+            from usuario_link ul
+            where ul.estado = true
+            group by ul.idusuario
+            '''
+
+            curs = self.connection.cursor()
+            curs.execute(sq)
+            dat = curs.fetchall()                
+            self.connection.commit()
+            
+            arrayListaNotificar = []
+
+            for usuario in dat:
+
+                select_query = '''SELECT link.link,
+                        link.nombre,
+                        link.autor,
+                        precio.fecha,
+                        precio.precio,
+                        link.id
+                FROM public.usuariotelegram AS usutel
+                INNER JOIN public.usuario_link AS usulink
+                ON usutel.idusuario = usulink.idusuario
+                INNER JOIN public.link AS link
+                ON usulink.idlink = link.id
+                INNER JOIN public.precio AS precio
+                ON link.id = precio.idlink
+                WHERE 
+                usutel.idchat = {} AND
+                usutel.estado = true AND
+                precio.nuevo = true
+                '''.format(usuario[0])
+
+                cursor = self.connection.cursor()
+                cursor.execute(select_query)
+                datos = cursor.fetchall()                
+                self.connection.commit()
+                arraylibros = []
+                for row in datos:
+
+                    select_query_precio_anterior = '''
+                        SELECT precio.fecha,
+                                precio.precio
+                        FROM public.precio as precio
+                        where precio.idlink = {} and
+                        precio.nuevo = false
+                        order by precio.fecha desc
+                        limit 1
+                    '''.format(row[5])
+
+                    cursor2 = self.connection.cursor()
+                    cursor2.execute(select_query_precio_anterior)
+                    datas = cursor2.fetchone()               
+                    self.connection.commit()
+
+                    arraylibros.append({
+                        "link":row[0],
+                        "nombre": row[1],
+                        "autor":row[2],
+                        "fechanuevo":row[3].strftime("%d-%m-%Y"),
+                        "precionuevo":row[4],
+                        "idlink": row[5],
+                        "fechaanterior":datas[0].strftime("%d-%m-%Y"),
+                        "precioanterior":datas[1]
+                    })
+
+            
+
+                arrayListaNotificar.append({
+                    'idchat': usuario[0],
+                    'libros': arraylibros
+                })
+
+            return arrayListaNotificar
+        except (Exception, psycopg2.Error) as error:
+            logging.info(error)
+            return error

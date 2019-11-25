@@ -61,14 +61,13 @@ def set_usuario():
 def get_preciosnuevos():
 
     try:
-        data = request.json
-    
+  
         dtb = db.database()
-        dtb.idchat = data['idchat']
-        lista = dtb.getListaPreciosUsuarioChat()
+        dataNotificaciones = dtb.getUsuariosConLinkYLibros()
+        
         return jsonify({
             'ok': 200,
-            "lista": lista
+            "datos": dataNotificaciones
         })
     except Exception as error:
         print(error)
