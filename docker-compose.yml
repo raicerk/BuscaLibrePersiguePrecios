@@ -1,7 +1,7 @@
-version: "2.1"
+version: "3.5"
 
 networks:
-  default:
+  buscalibre:
     name: buscalibre
     driver: bridge
     ipam:
@@ -17,7 +17,7 @@ services:
     ports:
       - 5432:5432
     networks:
-      default:
+      buscalibre:
         ipv4_address: 172.21.0.2
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -28,7 +28,7 @@ services:
     ports:
       - 80:5000
     networks:
-      default:
+      buscalibre:
         ipv4_address: 172.21.0.3
     env_file:
       - "config.env"
@@ -39,7 +39,7 @@ services:
     container_name: "bot"
     build: "./BotTelegram"
     networks:
-      default:
+      buscalibre:
         ipv4_address: 172.21.0.4
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -52,7 +52,7 @@ services:
     container_name: scraping
     build: "./Scraping"
     networks:
-      default:
+      buscalibre:
         ipv4_address: 172.21.0.5
     volumes:
       - /etc/localtime:/etc/localtime:ro
