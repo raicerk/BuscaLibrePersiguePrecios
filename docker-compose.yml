@@ -26,7 +26,7 @@ services:
     container_name: "api"
     build: "./API"
     ports:
-      - 80:5000
+      - 8000:5000
     networks:
       buscalibre:
         ipv4_address: 172.21.0.3
