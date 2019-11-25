@@ -60,3 +60,16 @@ services:
       - "config.env"
     depends_on:
       - DB
+  SERVERBOT:
+    image: serverbot
+    container_name: "serverbot"
+    build: "./ServerBot"
+    networks:
+      default:
+        ipv4_address: 172.21.0.6
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - "config.env"
+    depends_on:
+      - API
