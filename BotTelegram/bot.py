@@ -38,12 +38,9 @@ def send_welcome(message):
     })
 
     bot.send_message(message.chat.id, "Bienvenido a BuscaLibre persigue precios Bot")
-  
-@bot.message_handler(commands=['seguir'])
-def send_forward(message):
-    bot.send_message(message.chat.id,"A partir de ahora, cualquier link de un libro de buscalibre que nos envies sera analizado y te avisaremos a penas el precio del libro cambie 🙂")
-    bot.send_message(message.chat.id,"Para dejar de analizar los precios de un link de un libro usa el comando /parar")
-
+    bot.send_message(message.chat.id, "A partir de ahora, cualquier link de un libro de buscalibre que nos envies sera analizado y te avisaremos a penas el precio del libro cambie 🙂")
+    bot.send_message(message.chat.id, "Para dejar de analizar los precios de un link de un libro usa el comando /parar")
+ 
 @bot.message_handler(commands=['parar'])
 def send_stop(message):
     

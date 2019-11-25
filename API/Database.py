@@ -214,6 +214,7 @@ class database:
                 WHERE 
                 usutel.idchat = {} AND
                 usutel.estado = true AND
+                usulink.estado = true AND
                 precio.nuevo = true
                 '''.format(usuario[0])
 
