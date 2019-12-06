@@ -2,6 +2,7 @@ import psycopg2
 import Scraping as scraping
 import time
 import os
+import logging
 
 class database:
 
@@ -21,24 +22,29 @@ class database:
                 port=os.getenv('POSTGRES_PORT'),
                 database=os.getenv('POSTGRES_DB')
             )
+        logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO,datefmt="%d-%m-%Y %H:%M:%S")
 
     def setPrecio(self):
 
         try:
+            logging.info("Ejecutando SetPrecio.....")
             insert_query = "INSERT INTO precio (idlink, precio, fecha, nuevo) values ({}, {}, '{}', {}) RETURNING id;".format(self.idlink, self.precio, self.fecha, True)
             cursor = self.connection.cursor()
             cursor.execute(insert_query)
             id_inserted = cursor.fetchone()[0]
             self.connection.commit()
             count = cursor.rowcount
+            logging.info("Retorno datos SetPrecio")
             return id_inserted
 
         except (Exception, psycopg2.Error) as error:
-            print(error)
+            logging.info("Error en SetPrecio")
+            return error
 
     def getListalink(self):
 
-        try:            
+        try:
+            logging.info("Ejecutando GetListaLink...")
             self.updatePrecioNuevo()
 
             select_query = '''SELECT link.id,
@@ -77,20 +83,24 @@ class database:
                 elif((scr.price != datas[0])):
                     arrayprecios.append(self.setPrecio())
 
+            logging.info("Retorna datos GetListaLink")
             return arrayprecios
         except (Exception, psycopg2.Error) as error:
-            print(error)
+            logging.info("Error en GetListaLink: {}".format(error))
+            return error
 
     def updatePrecioNuevo(self):
 
         try:
-            
+            logging.info("Ejecutando UpdatePrecioNuevo...")
             update_query = "UPDATE public.precio SET nuevo=false"
             cursor = self.connection.cursor()
             cursor.execute(update_query)
             self.connection.commit()
             count = cursor.rowcount
+            logging.info("Retorna datos UpdatePrecioNuevo")
             return count
 
         except (Exception, psycopg2.Error) as error:
-            print(error)
+            logging.info("Error en UpdatePrecioNuevo")
+            return error
