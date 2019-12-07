@@ -11,7 +11,7 @@ class database:
     link = ""
     nombre=""
     autor=""
-    fecha=''
+    fecha=""
     precio = 0
 
     def __init__(self): 
@@ -46,22 +46,32 @@ class database:
         try:
             logging.info("Ejecutando GetListaLink...")
             self.updatePrecioNuevo()
+            logging.info("1")
 
             select_query = '''SELECT link.id,
                 link.link        
             FROM public.link AS link
             '''
+            logging.info("2")
             cursor = self.connection.cursor()
+            logging.info("3")
             cursor.execute(select_query)
-            datos = cursor.fetchall()                
+            datos = cursor.fetchall()
+            logging.info("4")
             self.connection.commit()
+            logging.info("5")
             arrayprecios = []
+            logging.info(":::::::::::::::::::::::")
+            logging.info(datos)
+            logging.info(":::::::::::::::::::::::")
             for row in datos:
-
+                logging.info("6")
                 scr = scraping.scraping()
+                logging.info("7")
                 scr.url = row[1]
+                logging.info("7.1")
                 result = scr.scrap()
-
+                logging.info("8")
                 select_query_precio_anterior = '''
                     SELECT precio.precio
                     FROM public.precio as precio
@@ -70,17 +80,26 @@ class database:
                     order by precio.fecha desc
                     limit 1
                 '''.format(row[0])
-
+                logging.info("9")
                 cursor2 = self.connection.cursor()
+                logging.info("10")
                 cursor2.execute(select_query_precio_anterior)
-                datas = cursor2.fetchone()               
+                logging.info("11")
+                datas = cursor2.fetchone()
+                logging.info("12")
                 self.connection.commit()
+                logging.info("13")
                 self.precio = scr.price
+                logging.info("14")
                 self.idlink = row[0]
+                logging.info("5")
                 self.fecha = time.strftime("%Y-%m-%d")
+                logging.info("16")
                 if(datas is None):
+                    logging.info("17")
                     arrayprecios.append(self.setPrecio())
                 elif((scr.price != datas[0])):
+                    logging.info("18")
                     arrayprecios.append(self.setPrecio())
 
             logging.info("Retorna datos GetListaLink")
