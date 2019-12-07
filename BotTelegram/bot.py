@@ -13,14 +13,17 @@ bot = telebot.TeleBot(os.getenv('TOKEN_TELEGRAM'))
 
 def hilo():
 
-    while True:
-        if time.strftime("%H:%M:%S") == os.getenv('HORA_ALERTA'):
-            res = requests.post("http://{}/librospreciosnuevos".format(os.getenv('API_HOST')))
-            miresponse = res.json()
-            for lst in miresponse['datos']:
-                for libro in lst['libros']:
-                    bot.send_message(lst['idchat'], "El libro '{}' del autor '{}', a cambiado de precio, de ${} a un nuevo valor de ${}, el link del libro es: {}".format(libro['nombre'], libro['autor'], libro['precioanterior'], libro['precionuevo'], libro['link']))
-        time.sleep(1)
+    try:
+        while True:
+            if time.strftime("%H:%M:%S") == os.getenv('HORA_ALERTA'):
+                res = requests.post("http://{}/librospreciosnuevos".format(os.getenv('API_HOST')))
+                miresponse = res.json()
+                for lst in miresponse['datos']:
+                    for libro in lst['libros']:
+                        bot.send_message(lst['idchat'], "El libro '{}' del autor '{}', a cambiado de precio, de ${} a un nuevo valor de ${}, el link del libro es: {}".format(libro['nombre'], libro['autor'], libro['precioanterior'], libro['precionuevo'], libro['link']))
+            time.sleep(1)
+    except (Exception) as error:
+       logging.INFO(error)
 
 def is_url(url):
   try:
