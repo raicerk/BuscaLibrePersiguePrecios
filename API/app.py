@@ -70,7 +70,7 @@ def get_preciosnuevos():
             "datos": dataNotificaciones
         })
     except Exception as error:
-        print(error)
+        logging.info(error)
         return jsonify({
             'ok': 400
         })

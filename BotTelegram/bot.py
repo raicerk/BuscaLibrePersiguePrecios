@@ -20,10 +20,14 @@ def hilo():
                 miresponse = res.json()
                 for lst in miresponse['datos']:
                     for libro in lst['libros']:
-                        bot.send_message(lst['idchat'], "El libro '{}' del autor '{}', a cambiado de precio, de ${} a un nuevo valor de ${}, el link del libro es: {}".format(libro['nombre'], libro['autor'], libro['precioanterior'], libro['precionuevo'], libro['link']))
+                        bot.send_message(lst['idchat'], "El libro '{}' del autor '{}', a cambiado de precio".format(libro['nombre'], libro['autor']))
+                        bot.send_message(lst['idchat'], "Su mejor precio fue ${}".format(libro['preciomejor']))
+                        bot.send_message(lst['idchat'], "Su precio anterior era de ${}".format(libro['precioanterior']))
+                        bot.send_message(lst['idchat'], "Su precio actual ${}".format(libro['precionuevo']))
+                        bot.send_message(lst['idchat'], "El link del libro es: {}".format(libro['link']))
             time.sleep(1)
     except (Exception) as error:
-       logging.INFO(error)
+       logging.info(error)
 
 def is_url(url):
   try:
