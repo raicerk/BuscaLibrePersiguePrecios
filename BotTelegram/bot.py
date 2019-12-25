@@ -24,12 +24,11 @@ def hilo():
                 for lst in miresponse['datos']:
                     for libro in lst['libros']:
                         bot.send_message(lst['idchat'],
-                                         """
-                            El libro '{}' del autor '{}', a cambiado de precio
-                            su mejor precio fue ${:miles}
-                            su precio anterior era de ${:miles}
-                            su precio actual es de ${:miles}
-                            el link del libro es: {}
+                        """El libro '{}' del autor '{}' a cambiado de precio, 
+                        su mejor precio fue ${:miles}
+                        su precio anterior era de ${:miles}
+                        su precio actual es de ${:miles}
+                        el link del libro es: {}
                         """.format(
                             libro['nombre'],
                             libro['autor'],
