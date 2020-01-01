@@ -239,7 +239,8 @@ class database:
                         select min(precio)
                         FROM public.precio as precio
                         where precio.idlink = {} and
-                        precio.nuevo = false
+                        precio.nuevo = false and
+                        precio.precio > 0
                     '''.format(row[5])
 
                     data3 = self.select(select_query_precio_mejor)
