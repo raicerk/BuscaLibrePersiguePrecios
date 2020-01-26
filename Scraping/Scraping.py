@@ -8,14 +8,14 @@ import logging
 
 
 class scraping():
-    
+
     price = 0
     name = ""
-    author=""
+    author = ""
     url = ""
 
     def __init__(self):
-        logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO,datefmt="%d-%m-%Y %H:%M:%S")
+        logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO, datefmt="%d-%m-%Y %H:%M:%S")
 
     def simple_get(self):
         try:
@@ -31,8 +31,8 @@ class scraping():
     def is_good_response(self, resp):
         try:
             content_type = resp.headers['Content-Type'].lower()
-            return (resp.status_code == 200 
-                    and content_type is not None 
+            return (resp.status_code == 200
+                    and content_type is not None
                     and content_type.find('html') > -1)
         except Exception as error:
             logging.info(error)
@@ -41,16 +41,20 @@ class scraping():
         try:
             raw_html = self.simple_get()
             html = BeautifulSoup(raw_html, 'html.parser')
-            divData = html.findAll("div", {"class" : "datos"})
-            aData = ""
+            divData = html.findAll("div", {"class": "datos"})
+            resultAuthor = ""
+            resultName = ""
+            
             for tag in divData:
-                aData = tag.findAll("a", {"class": "font-color-bl link-underline"})
-            resultAuthor = aData
-            resultPrice = html.findAll("span", {"itemprop" : "price"})
-            resultName = html.findAll("h1", {"itemprop" : "name"})
-            self.price = int(resultPrice[0].text.replace("$ ", "").replace(".",""))
+                resultAuthor = tag.findAll("a", {"class": "font-color-bl link-underline"})
+                resultName = tag.findAll("h1")
+
+            resultPrice = html.findAll("p", {"class", "precioAhora"})
+                        
+            self.price = int(resultPrice[0].text.replace("$ ", "").replace(".", ""))
             self.name = resultName[0].text
             self.author = resultAuthor[0].text
+
             return ({
                 "precio": self.price,
                 "nombre": self.name,
