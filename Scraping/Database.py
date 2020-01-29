@@ -27,15 +27,19 @@ class database:
     def setPrecio(self):
 
         try:
-            logging.info("Ejecutando SetPrecio.....")
-            insert_query = "INSERT INTO precio (idlink, precio, fecha, nuevo) values ({}, {}, '{}', {}) RETURNING id;".format(self.idlink, self.precio, self.fecha, True)
-            cursor = self.connection.cursor()
-            cursor.execute(insert_query)
-            id_inserted = cursor.fetchone()[0]
-            self.connection.commit()
-            count = cursor.rowcount
-            logging.info("Retorno datos SetPrecio")
-            return id_inserted
+
+            if self.precio != 0:
+                logging.info("Ejecutando SetPrecio.....")
+                insert_query = "INSERT INTO precio (idlink, precio, fecha, nuevo) values ({}, {}, '{}', {}) RETURNING id;".format(self.idlink, self.precio, self.fecha, True)
+                cursor = self.connection.cursor()
+                cursor.execute(insert_query)
+                id_inserted = cursor.fetchone()[0]
+                self.connection.commit()
+                count = cursor.rowcount
+                logging.info("Retorno datos SetPrecio")
+                return id_inserted
+            else:
+                return 0
 
         except (Exception, psycopg2.Error) as error:
             logging.info("Error en SetPrecio")
