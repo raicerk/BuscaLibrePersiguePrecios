@@ -126,6 +126,14 @@ def send_help(message):
     message_id = message.chat.id
     bot.send_message(message_id, "Ayuda con los comandos del bot")
 
+@bot.message_handler(commands=['stop'])
+def send_stop(message):
+
+    r = requests.post("http://{}/disableusuario".format(os.getenv('API_HOST')), json={
+        "idusuario": message.from_user.id
+    })
+
+    bot.send_message(message.chat.id, "Se ha desactivado BuscaLibre persigue precios Bot")
 
 if __name__ == "__main__":
 
