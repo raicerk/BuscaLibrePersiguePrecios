@@ -47,6 +47,7 @@ def set_usuario():
         dtb.idusuario = data['idusuario']
         dtb.idchat = data['idchat']
         dtb.setUsuario()
+        dtb.setEnableUsuario()
         
         return jsonify({
             'ok': 200

@@ -293,3 +293,18 @@ class database:
 
         except (Exception, psycopg2.Error) as error:
             logging.info(error)
+
+
+    def setEnableUsuario(self):
+        
+        try:
+            update_query = "UPDATE public.usuariotelegram SET estado = true WHERE idusuario={};".format(self.idusuario)
+            cursor = self.connection.cursor()
+            cursor.execute(update_query)
+            self.connection.commit()
+            count = cursor.rowcount
+            logging.info(count, "Record updated successfully into table")
+            return count
+
+        except (Exception, psycopg2.Error) as error:
+            logging.info(error)
