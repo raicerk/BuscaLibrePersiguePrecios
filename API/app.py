@@ -113,5 +113,23 @@ def set_estadolibrousuario():
             'ok': 400
         })
 
+@app.route('/disableusuario', methods=['POST'])
+def set_DisableUsuario():
+    try:
+        data = request.json
+    
+        dtb = db.database()
+        dtb.idusuario = data['idusuario']
+        updated = dtb.setDisableUsuario()
+        return jsonify({
+            'ok': 200
+        })
+       
+    except Exception as error:
+        print(error)
+        return jsonify({
+            'ok': 400
+        })
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

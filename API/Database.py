@@ -278,3 +278,18 @@ class database:
         datos = cursor.fetchall()                
         self.connection.commit()
         return datos
+
+    
+    def setDisableUsuario(self):
+        
+        try:
+            update_query = "UPDATE public.usuariotelegram SET estado = false WHERE idusuario={};".format(self.idusuario)
+            cursor = self.connection.cursor()
+            cursor.execute(update_query)
+            self.connection.commit()
+            count = cursor.rowcount
+            logging.info(count, "Record updated successfully into table")
+            return count
+
+        except (Exception, psycopg2.Error) as error:
+            logging.info(error)
