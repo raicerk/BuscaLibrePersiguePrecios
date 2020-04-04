@@ -11,6 +11,9 @@ networks:
 services:
   DB:
     image: "postgres"
+    deploy:
+      restart_policy:
+        condition: on-failure
     container_name: "postgres"
     env_file:
       - "config.env"
@@ -23,6 +26,9 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
   API:
     image: api
+    deploy:
+      restart_policy:
+        condition: on-failure
     container_name: "api"
     build: "./API"
     ports:
@@ -36,6 +42,9 @@ services:
       - DB
   BOT:
     image: bot
+    deploy:
+      restart_policy:
+        condition: on-failure
     container_name: "bot"
     build: "./BotTelegram"
     networks:
@@ -49,6 +58,9 @@ services:
       - API
   SCRAPING:
     image: scraping
+    deploy:
+      restart_policy:
+        condition: on-failure
     container_name: scraping
     build: "./Scraping"
     networks:
