@@ -12,9 +12,7 @@ import formato as frm
 
 bot = telebot.TeleBot(os.getenv('TOKEN_TELEGRAM'))
 
-
 def hilo():
-
     try:
         while True:
             if time.strftime("%H:%M:%S") == os.getenv('HORA_ALERTA'):
@@ -24,7 +22,7 @@ def hilo():
                 for lst in miresponse['datos']:
                     for libro in lst['libros']:
                         bot.send_message(lst['idchat'],
-"""El libro '{}' del autor '{}' a cambiado de precio,
+                                         """El libro '{}' del autor '{}' a cambiado de precio,
 su mejor precio fue ${:miles}
 su precio anterior era de ${:miles}
 su precio actual es de ${:miles}
@@ -51,95 +49,111 @@ def is_url(url):
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
+    try:
+        r = requests.post("http://{}/creausuario".format(os.getenv('API_HOST')), json={
+            "idusuario": message.chat.id,
+            "idchat": message.from_user.id
+        })
 
-    r = requests.post("http://{}/creausuario".format(os.getenv('API_HOST')), json={
-        "idusuario": message.chat.id,
-        "idchat": message.from_user.id
-    })
+        bot.send_message(message.chat.id, "Bienvenido a BuscaLibre persigue precios Bot")
+        bot.send_message(message.chat.id, "A partir de ahora, cualquier link de un libro de buscalibre que nos envies sera analizado y te avisaremos a penas el precio del libro cambie 🙂")
+        bot.send_message(message.chat.id, "Para dejar de analizar los precios de un link de un libro usa el comando /parar")
 
-    bot.send_message(
-        message.chat.id, "Bienvenido a BuscaLibre persigue precios Bot")
-    bot.send_message(
-        message.chat.id, "A partir de ahora, cualquier link de un libro de buscalibre que nos envies sera analizado y te avisaremos a penas el precio del libro cambie 🙂")
-    bot.send_message(
-        message.chat.id, "Para dejar de analizar los precios de un link de un libro usa el comando /parar")
+    except Exception as error:
+        logging.info(error)
 
 
 @bot.message_handler(commands=['parar'])
 def send_stop(message):
+    try:
+        res = requests.post("http://{}/librosactivossusuario".format(os.getenv('API_HOST')), json={
+            "idchat": message.from_user.id
+        })
+        miresponse = res.json()
 
-    res = requests.post("http://{}/librosactivossusuario".format(os.getenv('API_HOST')), json={
-        "idchat": message.from_user.id
-    })
-    miresponse = res.json()
-
-    markup = InlineKeyboardMarkup()
-    for libro in miresponse['lista']:
-        markup.row(InlineKeyboardButton("'{}' escrito por '{}'".format(
-            libro["nombre"], libro["autor"]), callback_data=libro['id']))
-    bot.send_message(
-        message.chat.id, "Selecciona un libro para dejar de analizarlo:", reply_markup=markup)
+        markup = InlineKeyboardMarkup()
+        for libro in miresponse['lista']:
+            markup.row(InlineKeyboardButton("'{}' escrito por '{}'".format(
+                libro["nombre"], libro["autor"]), callback_data=libro['id']))
+        bot.send_message(message.chat.id, "Selecciona un libro para dejar de analizarlo:", reply_markup=markup)
+    
+    except Exception as error:
+        logging.info(error)
 
 
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
+    try:
+        if is_url(message.text):
 
-    if is_url(message.text):
+            user_id = message.from_user.id
+            message_id = message.chat.id
+            message_text = message.text
 
-        user_id = message.from_user.id
-        message_id = message.chat.id
-        message_text = message.text
+            r = requests.post("http://{}/almacenaLink".format(os.getenv('API_HOST')), json={
+                "link": message_text,
+                "idusuario": user_id,
+                "idchat": message_id
+            })
 
-        r = requests.post("http://{}/almacenaLink".format(os.getenv('API_HOST')), json={
-            "link": message_text,
-            "idusuario": user_id,
-            "idchat": message_id
-        })
+            if r:
+                bot.send_message(message_id, "Link registrado correctamente, te avisaremos apenas cambie el precio del libro 🙂")
 
-        if r:
-            bot.send_message(
-                message_id, "Link registrado correctamente, te avisaremos apenas cambie el precio del libro 🙂")
+    except Exception as error:
+        logging.info(error)
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
+    try:
+        r = requests.post("http://{}/estadolibrousuario".format(os.getenv('API_HOST')), json={
+            "idusuario": call.from_user.id,
+            "idlink": call.data
+        })
 
-    r = requests.post("http://{}/estadolibrousuario".format(os.getenv('API_HOST')), json={
-        "idusuario": call.from_user.id,
-        "idlink": call.data
-    })
+        opciones = []
 
-    opciones = []
+        for iter in call.message.json["reply_markup"]["inline_keyboard"]:
+            opciones.append(iter[0])
 
-    for iter in call.message.json["reply_markup"]["inline_keyboard"]:
-        opciones.append(iter[0])
+        filtrado = list(filter(lambda iter: iter["callback_data"] == call.data, opciones))
 
-    filtrado = list(
-        filter(lambda iter: iter["callback_data"] == call.data, opciones))
+        bot.send_message(call.from_user.id, "Se elimino del analisis el libro {}".format(filtrado[0]["text"]))
 
-    bot.send_message(call.from_user.id, "Se elimino del analisis el libro {}".format(
-        filtrado[0]["text"]))
+    except Exception as error:
+        logging.info(error)
 
 
 @bot.message_handler(commands=['help', 'ayuda'])
 def send_help(message):
-    message_id = message.chat.id
-    bot.send_message(message_id, "Ayuda con los comandos del bot")
+    try:
+        message_id = message.chat.id
+        bot.send_message(message_id, "Ayuda con los comandos del bot")
+    except Exception as error:
+        logging.info(error)
+
 
 @bot.message_handler(commands=['stop'])
 def send_stop(message):
+    try:
+        r = requests.post("http://{}/disableusuario".format(os.getenv('API_HOST')), json={
+            "idusuario": message.from_user.id
+        })
 
-    r = requests.post("http://{}/disableusuario".format(os.getenv('API_HOST')), json={
-        "idusuario": message.from_user.id
-    })
+        bot.send_message(message.chat.id, "Se ha desactivado BuscaLibre persigue precios Bot")
 
-    bot.send_message(message.chat.id, "Se ha desactivado BuscaLibre persigue precios Bot")
+    except Exception as error:
+        logging.info(error)
+
 
 if __name__ == "__main__":
 
-    logging.basicConfig(format="%(asctime)s: %(message)s",
-                        level=logging.INFO, datefmt="%H:%M:%S")
+    try:
+        logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO, datefmt="%H:%M:%S")
 
-    threading.Thread(target=hilo).start()
+        threading.Thread(target=hilo).start()
 
-    bot.polling()
+        bot.polling()
+
+    except Exception as error:
+        logging.info(error)
